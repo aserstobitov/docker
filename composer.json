@@ -2,5 +2,18 @@
     "name": "shopware/docker",
     "type": "metapackage",
     "license": "MIT",
-    "description": "Docker image for Shopware 6 production"
+    "description": "Docker image for Shopware 6 production",
+    "require": {
+        "php": "^8.2",
+        "composer-runtime-api": "^2.0",
+        "shopware/administration": "~v6.5.0",
+        "shopware/core": "~v6.5.0",
+        "shopware/elasticsearch": "~v6.5.0",
+        "shopware/storefront": "~v6.5.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/runtime": true
+        }
+    }
 }

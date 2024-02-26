@@ -1,0 +1,82 @@
+version: "3.8"
+services:
+    db:
+        image: mysql:8.0
+        environment:
+            MYSQL_ROOT_PASSWORD: 'shopware'
+            MYSQL_USER: shopware
+            MYSQL_PASSWORD: shopware
+            MYSQL_DATABASE: shopware
+        volumes:
+        - mysql-data:/var/lib/mysql
+
+    init-perm:
+        image: alpine
+        volumes:
+            - files:/var/www/html/files
+            - theme:/var/www/html/public/theme
+            - media:/var/www/html/public/media
+            - thumbnail:/var/www/html/public/thumbnail
+            - sitemap:/var/www/html/public/sitemap
+        command: chown 82:82 /var/www/html/files /var/www/html/public/theme /var/www/html/public/media /var/www/html/public/thumbnail /var/www/html/public/sitemap
+
+    init:
+        image: ghcr.io/aserstobitov/docker-base:8.2-fpm-amd64
+        build:
+            context: .
+        env_file: .app.env
+        entrypoint: /setup
+        volumes:
+            - files:/var/www/html/files
+            - theme:/var/www/html/public/theme
+            - media:/var/www/html/public/media
+            - thumbnail:/var/www/html/public/thumbnail
+            - sitemap:/var/www/html/public/sitemap
+        depends_on:
+            db:
+                condition: service_started
+            init-perm:
+                condition: service_completed_successfully
+    web:
+        image: ghcr.io/aserstobitov/docker-base:8.2-fpm-amd64
+        build:
+            context: .
+        volumes:
+            - files:/var/www/html/files
+            - theme:/var/www/html/public/theme
+            - media:/var/www/html/public/media
+            - thumbnail:/var/www/html/public/thumbnail
+            - sitemap:/var/www/html/public/sitemap
+        depends_on:
+            init:
+                condition: service_completed_successfully
+        env_file: .app.env
+        ports:
+            - 8000:8000
+
+    worker:
+        image: ghcr.io/aserstobitov/docker-base:8.2-fpm-amd64
+        restart: unless-stopped
+        build:
+            context: .
+        volumes:
+            - files:/var/www/html/files
+            - theme:/var/www/html/public/theme
+            - media:/var/www/html/public/media
+            - thumbnail:/var/www/html/public/thumbnail
+            - sitemap:/var/www/html/public/sitemap
+        depends_on:
+            init:
+                condition: service_completed_successfully
+        env_file: .app.env
+        entrypoint: [ "php", "bin/console", "messenger:consume", "async", "--time-limit=300", "--memory-limit=512M" ]
+        deploy:
+            replicas: 3
+
+volumes:
+    mysql-data:
+    files:
+    theme:
+    media:
+    thumbnail:
+    sitemap:
