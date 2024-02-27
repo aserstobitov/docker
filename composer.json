@@ -1,19 +1,57 @@
 {
-    "name": "shopware/docker",
-    "type": "metapackage",
-    "license": "MIT",
-    "description": "Docker image for Shopware 6 production",
+    "license": "proprietary",
+    "type": "project",
     "require": {
-        "php": "^8.2",
         "composer-runtime-api": "^2.0",
+        "frosh/lazy-sizes": "^2.0",
+        "shopware/docker": "^0.1.0",
+        "frosh/tools": "^1.0",
         "shopware/administration": "~v6.5.0",
         "shopware/core": "~v6.5.0",
         "shopware/elasticsearch": "~v6.5.0",
-        "shopware/storefront": "~v6.5.0"
+        "shopware/storefront": "~v6.5.0",
+        "symfony/flex": "~2",
+        "symfony/runtime": "^5.0|^6.0"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "custom/static-plugins/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
     "config": {
         "allow-plugins": {
+            "symfony/flex": true,
             "symfony/runtime": true
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform": {
+            "php": "8.2.1"
+        }
+    },
+    "scripts": {
+        "auto-scripts": {
+            "assets:install": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "endpoint": [
+                "https://raw.githubusercontent.com/shopware/recipes/flex/main/index.json",
+                "flex://defaults"
+            ]
         }
     }
-}
