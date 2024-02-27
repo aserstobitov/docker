@@ -11,9 +11,21 @@ permissions:
   packages: write
 
 jobs:
-  build:
-    uses: shopware/github-actions/.github/workflows/build-docker-image.yml@main
-    with:
-      bun-version: '1.0.22'
-    secrets:
-      ghToken: ${{ secrets.GITHUB_TOKEN }}
+    run:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: Install Shopware-CLI
+          uses: FriendsOfShopware/shopware-cli-action@v1
+        
+        - name: Generate jwt-private
+          run: echo "$(shopware-cli project generate-jwt --env)"
+  
+  # build:
+  #   uses: shopware/github-actions/.github/workflows/build-docker-image.yml@main
+  #   with:
+  #     bun-version: '1.0.22'
+  #   secrets:
+  #     ghToken: ${{ secrets.GITHUB_TOKEN }}
