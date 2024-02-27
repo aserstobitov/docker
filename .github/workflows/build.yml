@@ -24,7 +24,7 @@ jobs:
           uses: FriendsOfShopware/shopware-cli-action@v1
         
         - name: Generate jwt-private
-          run: echo "${{ shopware-cli project generate-jwt --env }}"
+          run: echo shopware-cli project generate-jwt --env
   
   # build:
   #   uses: shopware/github-actions/.github/workflows/build-docker-image.yml@main
